@@ -5,9 +5,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -52,6 +55,14 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
         setResizable(false);
         setTitle("Mis anuncios");
         setContentPane(contentPane);
+        
+        try {
+            setIconImage(ImageIO.read(new File("resources/images/iconoApp.jpg")));
+        } catch (IOException e) {
+            // TODO: handle exception
+            System.out.println("Error al cargar el logo.");
+            e.printStackTrace();
+        }
 
         JLabel lbTitulo = new JLabel("Mis anuncios", JLabel.LEFT);
         contentPane.add(lbTitulo, BorderLayout.NORTH);
