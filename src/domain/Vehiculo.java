@@ -8,14 +8,24 @@ public class Vehiculo {
     private double precio;
     private String estado; //En venta o Vendido
     private String tipo; //Electrico, Hibrido o Gasolina
+    private String matricula;
+    private int km;
     
 
-    public Vehiculo(String marca, String modelo, int anio, double precio, String estado) {
+    public Vehiculo(String marca, String modelo, int anio, double precio, String estado, String tipo, String matricula, int km) {
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
         this.precio = precio;
         this.estado = estado;
+        this.tipo = tipo;
+        this.matricula = matricula;
+        this.km = km;
+    }
+
+    // Constructor compatible con el código anterior de Prueba.java.
+    public Vehiculo(String marca, String modelo, int anio, double precio, String estado) {
+        this(marca, modelo, anio, precio, estado, null, null, 0);
     }
 
     public String getMarca() {
@@ -65,4 +75,22 @@ public class Vehiculo {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
+
+	public String getMatricula() {
+		return matricula;
+	}
+
+	public void setMatricula(String matricula) {
+		this.matricula = matricula;
+	}
+
+	public int getKm() {
+		return km;
+	}
+
+	public void setKm(int km) {
+		this.km = km;
+	}
+    
+    
 }
