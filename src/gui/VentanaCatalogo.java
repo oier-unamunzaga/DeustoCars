@@ -2,10 +2,13 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -16,14 +19,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import domain.Vehiculo;
 import domain.Vehiculo.Estado;
 import domain.Vehiculo.Marca;
 import domain.Vehiculo.Tipo;
+import gui.tablas.RendererCombustible;
+import gui.tablas.RendererMarca;
 
 
 public class VentanaCatalogo extends JFrame {
@@ -49,6 +54,8 @@ public class VentanaCatalogo extends JFrame {
 	
 	private JLabel lblResultados;
 
+	private ArrayList<Vehiculo> vehiculos;
+
 	public VentanaCatalogo() {
 		setTitle("DeustoCars");
 		setSize(1280, 720);
@@ -66,12 +73,11 @@ public class VentanaCatalogo extends JFrame {
 
 	private JPanel crearPanelSuperior() {
 		JPanel panelSuperior = new JPanel(new BorderLayout(0, 10));
-		panelSuperior.setBorder(crearBorde());
 
 		panelSuperior.add(crearPanelBusqueda(), BorderLayout.NORTH);
 		panelSuperior.add(crearPanelFiltros(), BorderLayout.CENTER);
 
-		return panelSuperior;
+		return crearRecuadro(panelSuperior);
 	}
 
 	private JPanel crearPanelBusqueda() {
@@ -83,12 +89,20 @@ public class VentanaCatalogo extends JFrame {
 
 		txtBuscar = new JTextField();
 		txtBuscar.setPreferredSize(new Dimension(1030, 40));
+		// filtra cada vez que se suelta una tecla
+		txtBuscar.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				filtrar();
+			}
+		});
 		panelBusqueda.add(txtBuscar, BorderLayout.CENTER);
 
 		return panelBusqueda;
 	}
 
 	private JPanel crearPanelFiltros() {
+		// fila 1: títulos, fila 2: combos
 		JPanel panelFiltros = new JPanel(new GridLayout(2, 5, 30, 5));
 
 		String[] titulos = {"Marca", "Combustible", "Año desde", "Precio hasta", "Km hasta"};
@@ -150,43 +164,66 @@ public class VentanaCatalogo extends JFrame {
 
 	private JPanel crearPanelTabla() {
 		JPanel panelTabla = new JPanel(new BorderLayout());
-		panelTabla.setBorder(crearBorde());
 
-		String[] columnas = {"Foto", "Marca", "Modelo", "Año", "Precio", "Km", "Combustible"};
+		String[] columnas = {"Marca", "Modelo", "Año", "Precio", "Km", "Combustible"};
 		modeloTabla = new DefaultTableModel(columnas, 0) {
 			private static final long serialVersionUID = 1L;
 
+			// ninguna celda editable
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
 
-		for (Vehiculo vehiculo : cargarVehiculosPrueba()) {
-			Object[] fila = {"", vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getAnio(), vehiculo.getPrecio(), vehiculo.getKm(), vehiculo.getTipo()};
+		vehiculos = cargarVehiculosPrueba();
+		for (Vehiculo vehiculo : vehiculos) {
+			Object[] fila = {vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getAnio(), vehiculo.getPrecio(), vehiculo.getKm(), vehiculo.getTipo()};
 			modeloTabla.addRow(fila);
 		}
 
 		tablaVehiculos = new JTable(modeloTabla);
 		tablaVehiculos.setRowHeight(55);
+		tablaVehiculos.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
-		Dimension tamanyoCabecera = tablaVehiculos.getTableHeader().getPreferredSize();
-		tablaVehiculos.getTableHeader().setPreferredSize(new Dimension(tamanyoCabecera.width, 40));
+		tablaVehiculos.getColumnModel().getColumn(0).setPreferredWidth(180);
+		tablaVehiculos.getColumnModel().getColumn(1).setPreferredWidth(260);
+		tablaVehiculos.getColumnModel().getColumn(2).setPreferredWidth(140);
+		tablaVehiculos.getColumnModel().getColumn(3).setPreferredWidth(180);
+		tablaVehiculos.getColumnModel().getColumn(4).setPreferredWidth(160);
+		tablaVehiculos.getColumnModel().getColumn(5).setPreferredWidth(250);
 
-		int[] anchos = {180, 135, 210, 125, 160, 145, 215};
-		for (int i = 0; i < anchos.length; i++) {
-			tablaVehiculos.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
-		}
+		// año, precio y km centrados
+		DefaultTableCellRenderer centrado = new DefaultTableCellRenderer();
+		centrado.setHorizontalAlignment(JLabel.CENTER);
+		tablaVehiculos.getColumnModel().getColumn(2).setCellRenderer(centrado);
+		tablaVehiculos.getColumnModel().getColumn(3).setCellRenderer(centrado);
+		tablaVehiculos.getColumnModel().getColumn(4).setCellRenderer(centrado);
+
+		// ayudado y comprobado con la IA
+		// deja 20 px a la izquierda dentro de la celda
+		DefaultTableCellRenderer conMargen = new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel celda = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				celda.setBorder(new EmptyBorder(0, 20, 0, 0));
+				return celda;
+			}
+		};
+		tablaVehiculos.getColumnModel().getColumn(0).setCellRenderer(new RendererMarca());
+		tablaVehiculos.getColumnModel().getColumn(1).setCellRenderer(conMargen);
+		tablaVehiculos.getColumnModel().getColumn(5).setCellRenderer(new RendererCombustible());
 
 		scrollTabla = new JScrollPane(tablaVehiculos);
 		panelTabla.add(scrollTabla, BorderLayout.CENTER);
 
-		return panelTabla;
+		return crearRecuadro(panelTabla);
 	}
 
 	private JPanel crearPanelInferior() {
 		JPanel panelInferior = new JPanel(new BorderLayout());
-		panelInferior.setBorder(crearBorde());
 
 		JPanel panelOrdenar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
 
@@ -206,20 +243,43 @@ public class VentanaCatalogo extends JFrame {
 		lblResultados = new JLabel(modeloTabla.getRowCount() + " resultados");
 		panelInferior.add(lblResultados, BorderLayout.EAST);
 
-		return panelInferior;
+		return crearRecuadro(panelInferior);
 	}
 
-	private Border crearBorde() {
-		Border linea = BorderFactory.createLineBorder(new Color(46, 139, 87), 2);
-		Border margen = new EmptyBorder(10, 10, 10, 10);
-		return BorderFactory.createCompoundBorder(linea, margen);
+	// vacía la tabla y añade solo los coches cuya marca o modelo contienen el texto
+	private void filtrar() {
+		String texto = txtBuscar.getText().toLowerCase();
+
+		modeloTabla.setRowCount(0);
+		for (Vehiculo vehiculo : vehiculos) {
+			String marca = vehiculo.getMarca().toString().toLowerCase();
+			String modelo = vehiculo.getModelo().toLowerCase();
+
+			if (marca.contains(texto) || modelo.contains(texto)) {
+				Object[] fila = {vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getAnio(), vehiculo.getPrecio(), vehiculo.getKm(), vehiculo.getTipo()};
+				modeloTabla.addRow(fila);
+			}
+		}
+
+		lblResultados.setText(modeloTabla.getRowCount() + " resultados");
+	}
+
+	// recuadro verde con el contenido separado 10 px del borde
+	private JPanel crearRecuadro(JPanel contenido) {
+		contenido.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		JPanel recuadro = new JPanel(new BorderLayout());
+		recuadro.setBorder(BorderFactory.createLineBorder(new Color(46, 139, 87), 2));
+		recuadro.add(contenido, BorderLayout.CENTER);
+
+		return recuadro;
 	}
 
 	private ArrayList<Vehiculo> cargarVehiculosPrueba() {
 		ArrayList<Vehiculo> vehiculos = new ArrayList<Vehiculo>();
 		vehiculos.add(new Vehiculo(Marca.TESLA, "Model 3", 2024, 41000, Estado.EN_VENTA, Tipo.ELECTRICO, "1234ABC", 30000));
 		vehiculos.add(new Vehiculo(Marca.TOYOTA, "Corolla Hybrid", 2022, 24500, Estado.EN_VENTA, Tipo.HIBRIDO, "1254ABC", 3000));
-		vehiculos.add(new Vehiculo(Marca.VOLKSWAGEN,"Golf", 2021, 19900, Estado.EN_VENTA, Tipo.GASOLINA, "9012GHI", 20000));
+		vehiculos.add(new Vehiculo(Marca.VOLKSWAGEN, "Golf", 2021, 19900, Estado.EN_VENTA, Tipo.GASOLINA, "9012GHI", 20000));
 		vehiculos.add(new Vehiculo(Marca.BMW, "320i", 2020, 27800, Estado.EN_VENTA, Tipo.GASOLINA, "3456JKL", 12000));
 		vehiculos.add(new Vehiculo(Marca.HYUNDAI, "Kona EV", 2023, 29950, Estado.EN_VENTA, Tipo.HIBRIDO, "7890MNO", 21000));
 		return vehiculos;
