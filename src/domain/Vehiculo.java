@@ -2,17 +2,73 @@ package domain;
 
 public class Vehiculo {
 
-    private String marca;
+    private Marca marca;
     private String modelo;
     private int anio;
     private double precio;
-    private String estado; //En venta o Vendido
-    private String tipo; //Electrico, Hibrido o Gasolina
+    private Estado estado; //En venta o Vendido
+    private Tipo tipo; //Electrico, Hibrido o Gasolina
     private String matricula;
     private int km;
-    
+    //Marcas de coche que se pueden usar
+    public enum Marca {
+    	TOYOTA("Toyota", "resources/images/marcas/toyota.png"),
+    	BMW("BMW", "resources/images/marcas/bmw.png"),
+    	AUDI("Audi", "resources/images/marcas/audi.png"),
+    	RENAULT("Renault", "resources/images/marcas/renault.png"),
+    	VOLKSWAGEN("Volkswagen", "resources/images/marcas/volkswagen.png"),
+    	HYUNDAI("Hyundai", "resources/images/marcas/hyundai.png"),
+    	SEAT("SEAT", "resources/images/marcas/seat.png"),
+    	DACIA("Dacia", "resources/images/marcas/dacia.png"),
+    	KIA("Kia", "resources/images/marcas/kia.png"),
+    	PEUGEOT("Peugeot", "resources/images/marcas/peugeot.png"),
+    	MERCEDES_BENZ("Mercedes-Benz", "resources/images/marcas/mercedes.png"),
+    	SKODA("Škoda", "resources/images/marcas/skoda.png"),
+    	NISSAN("Nissan", "resources/images/marcas/nissan.png"),
+    	CITROEN("Citroën", "resources/images/marcas/citroen.png"),
+    	FORD("Ford", "resources/images/marcas/ford.png"),
+    	CUPRA("CUPRA", "resources/images/marcas/cupra.png"),
+    	OPEL("Opel", "resources/images/marcas/opel.png"),
+    	BYD("BYD", "resources/images/marcas/byd.png"),
+    	MAZDA("Mazda", "resources/images/marcas/mazda.png"),
+    	MASERATI("Maserati", "resources/images/marcas/maserati.png"),
+    	PORSCHE("Porsche", "resources/images/marcas/porsche.png"),
+    	TESLA("Tesla", "resources/images/marcas/tesla.png"),
+    	FERRARI("Ferrari", "resources/images/marcas/ferrari.png");
 
-    public Vehiculo(String marca, String modelo, int anio, double precio, String estado, String tipo, String matricula, int km) {
+        private final String nombre;
+        private final String rutaImagen;
+
+        Marca(String nombre, String rutaImagen) {
+            this.nombre = nombre;
+            this.rutaImagen = rutaImagen;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public String getRutaImagen() {
+            return rutaImagen;
+        }
+
+        @Override
+        public String toString() {
+            return nombre;
+        }
+    }
+    
+    //Estado del vehiculo
+    public enum Estado {
+    	EN_VENTA, VENDIDO
+    }
+    
+    //Tipo de combustible
+    public enum Tipo {
+    	ELECTRICO, GASOLINA, HIBRIDO
+    }
+    
+    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado, Tipo tipo, String matricula, int km) {
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
@@ -24,15 +80,15 @@ public class Vehiculo {
     }
 
     // Constructor compatible con el código anterior de Prueba.java.
-    public Vehiculo(String marca, String modelo, int anio, double precio, String estado) {
+    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado) {
         this(marca, modelo, anio, precio, estado, null, null, 0);
     }
 
-    public String getMarca() {
+    public Marca getMarca() {
         return marca;
     }
 
-    public void setMarca(String marca) {
+    public void setMarca(Marca marca) {
         this.marca = marca;
     }
 
@@ -60,19 +116,19 @@ public class Vehiculo {
         this.precio = precio;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
-	public String getTipo() {
+	public Tipo getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(String tipo) {
+	public void setTipo(Tipo tipo) {
 		this.tipo = tipo;
 	}
 
