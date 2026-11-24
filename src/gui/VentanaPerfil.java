@@ -23,6 +23,9 @@ import javax.swing.table.TableCellRenderer;
 
 import domain.Solicitud;
 import domain.Vehiculo;
+import domain.Vehiculo.Estado;
+import domain.Vehiculo.Marca;
+import domain.Vehiculo.Tipo;
 
 public class VentanaPerfil extends JFrame{
 	//Paneles
@@ -259,10 +262,9 @@ public class VentanaPerfil extends JFrame{
 	
 	public static void main(String[] args) {
 		//Datos de prueba
-		Vehiculo v1 = new Vehiculo("Toyota", "Corolla", 2019, 18500, "En venta", "Hibrido", "1234ABC", 60000);
-		Vehiculo v2 = new Vehiculo("Seat", "Ibiza", 2015, 9900, "Vendido", "Gasolina", "5678DEF", 120000);
-		Vehiculo v3 = new Vehiculo("Tesla", "Model 3", 2021, 32000, "En venta", "Electrico", "9012GHI", 40000);
-
+		Vehiculo v1 = new Vehiculo(Marca.TOYOTA, "Corolla", 2019, 18500, Estado.EN_VENTA,Tipo.HIBRIDO, "1234ABC", 60000);
+		Vehiculo v2 = new Vehiculo(Marca.SEAT, "Ibiza", 2015, 9900, Estado.VENDIDO, Tipo.GASOLINA, "5678DEF", 120000);
+		Vehiculo v3 = new Vehiculo(Marca.TESLA, "Model 3", 2024, 41000, Estado.EN_VENTA, Tipo.ELECTRICO, "1234ABC", 30000);
 		List<Vehiculo> lf = new ArrayList<>();
 		lf.add(v1);
 		lf.add(v2);

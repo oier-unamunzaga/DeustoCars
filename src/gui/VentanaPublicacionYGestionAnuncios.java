@@ -25,8 +25,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellRenderer;
 
 import domain.Vehiculo;
+import domain.Vehiculo.Estado;
+import domain.Vehiculo.Marca;
+import domain.Vehiculo.Tipo;
 import gui.tablas.AccionesEditorTabla;
 import gui.tablas.ModeloTablaAnuncios;
+
 //Las dimensiones para que quede todo mas o menos homogeneo me las ha dado la IA
 public class VentanaPublicacionYGestionAnuncios extends JFrame {
 
@@ -55,11 +59,10 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
         setResizable(false);
         setTitle("Mis anuncios");
         setContentPane(contentPane);
-        
+
         try {
             setIconImage(ImageIO.read(new File("resources/images/iconoApp.jpg")));
         } catch (IOException e) {
-            // TODO: handle exception
             System.out.println("Error al cargar el logo.");
             e.printStackTrace();
         }
@@ -87,7 +90,7 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
                     panel.setOpaque(true);
                     panel.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
                     panel.add(new JButton("Eliminar vehículo"));
-                    if ("En venta".equals(coche.getEstado())) {
+                    if (Estado.EN_VENTA.equals(coche.getEstado())) {
                         panel.add(new JButton("Editar anuncio"));
                     }
                     return panel;
@@ -117,9 +120,9 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
         JPanel pNuevoVehiculo = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 4));
         JButton bAnadirVehiculo = new JButton("Añadir nuevo vehículo");
         bAnadirVehiculo.addActionListener(e -> {
-        	//Desmarco por si habia seleccionado algun vehiculo
-        	tablaAnuncios.clearSelection();
-        	mostrarFormularioNuevoVehiculo();
+            //Desmarco por si habia seleccionado algun vehiculo
+            tablaAnuncios.clearSelection();
+            mostrarFormularioNuevoVehiculo();
         });
         pNuevoVehiculo.add(bAnadirVehiculo);
         contentPane.add(pNuevoVehiculo, BorderLayout.SOUTH);
@@ -140,8 +143,8 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
 
     //Datos de prueba
     private void cargarDatosDePrueba() {
-        coches.add(new Vehiculo("Toyota", "Corolla", 2021, 18500, "En venta", "Hibrido", "1234ABC", 45000));
-        coches.add(new Vehiculo("Seat", "Ibiza", 2019, 12900, "Vendido", "Gasolina", "5678DEF", 80000));
+        coches.add(new Vehiculo(Marca.TOYOTA, "Corolla", 2021, 18500, Estado.EN_VENTA, Tipo.HIBRIDO, "1234ABC", 45000));
+        coches.add(new Vehiculo(Marca.SEAT, "Ibiza", 2019, 12900, Estado.VENDIDO, Tipo.GASOLINA, "5678DEF", 80000));
         actualizarTabla();
     }
 
@@ -159,12 +162,12 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
 
         JPanel pCampos = new JPanel(new GridLayout(8, 2, 8, 8));
         //Solo son editables el Precio y el Estado
-        tfMarca = crearCampo(pCampos, "Marca:", coche.getMarca(), false);
+        tfMarca = crearCampo(pCampos, "Marca:", String.valueOf(coche.getMarca()), false);
         tfModelo = crearCampo(pCampos, "Modelo:", coche.getModelo(), false);
         tfAnio = crearCampo(pCampos, "Año:", String.valueOf(coche.getAnio()), false);
         tfPrecio = crearCampo(pCampos, "Precio (€):", String.valueOf(coche.getPrecio()), editable);
-        tfEstado = crearCampo(pCampos, "Estado:", coche.getEstado(), editable);
-        tfTipo = crearCampo(pCampos, "Tipo:", coche.getTipo(), false);
+        tfEstado = crearCampo(pCampos, "Estado:", String.valueOf(coche.getEstado()), editable);
+        tfTipo = crearCampo(pCampos, "Tipo:", String.valueOf(coche.getTipo()), false);
         tfMatricula = crearCampo(pCampos, "Matrícula:", coche.getMatricula(), false);
         tfKm = crearCampo(pCampos, "Kilómetros:", String.valueOf(coche.getKm()), false);
         pDetalles.add(pCampos, BorderLayout.CENTER);
@@ -196,7 +199,7 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
         tfModelo = crearCampo(pCampos, "Modelo:", "", true);
         tfAnio = crearCampo(pCampos, "Año:", "", true);
         tfPrecio = crearCampo(pCampos, "Precio (€):", "", true);
-        tfEstado = crearCampo(pCampos, "Estado:", "En venta", true);
+        tfEstado = crearCampo(pCampos, "Estado:", Estado.EN_VENTA.name(), true);
         tfTipo = crearCampo(pCampos, "Tipo:", "", true);
         tfMatricula = crearCampo(pCampos, "Matrícula:", "", true);
         tfKm = crearCampo(pCampos, "Kilómetros:", "", true);
@@ -223,9 +226,9 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
         panel.add(new JLabel(texto));
         JTextField campo = new JTextField(valor);
         if (editable) {
-        	campo.setBackground(Color.WHITE);
+            campo.setBackground(Color.WHITE);
         } else {
-        	campo.setBackground(Color.LIGHT_GRAY);
+            campo.setBackground(Color.LIGHT_GRAY);
         }
         campo.setEditable(editable);
         panel.add(campo);
@@ -235,40 +238,47 @@ public class VentanaPublicacionYGestionAnuncios extends JFrame {
     //Solo se pueden modificar el Precio y el Estado
     private void guardarCambios() {
         try {
-        	if (Double.parseDouble(tfPrecio.getText()) <= 0) {
-        		JOptionPane.showMessageDialog(this, "El Precio debe ser mayor de 0.",
+            double precio = Double.parseDouble(tfPrecio.getText().trim());
+            if (precio <= 0) {
+                JOptionPane.showMessageDialog(this, "El Precio debe ser mayor de 0.",
                         "Datos incorrectos", JOptionPane.WARNING_MESSAGE);
-        	}
-            cocheSeleccionado.setPrecio(Double.parseDouble(tfPrecio.getText()));
-            cocheSeleccionado.setEstado(tfEstado.getText());
+                return;
+            }
+            cocheSeleccionado.setPrecio(precio);
+            cocheSeleccionado.setEstado(Estado.valueOf(tfEstado.getText().trim().toUpperCase().replace(" ", "_")));
             actualizarTabla();
             mostrarDetalles(cocheSeleccionado, false);
-        } catch (NumberFormatException excepcion) {
-            JOptionPane.showMessageDialog(this, "El Precio debe ser numérico.",
+        } catch (IllegalArgumentException excepcion) {
+            JOptionPane.showMessageDialog(this,
+                    "El Precio debe ser numérico y el Estado debe ser válido (ej. EN_VENTA, VENDIDO).",
                     "Datos incorrectos", JOptionPane.WARNING_MESSAGE);
         }
     }
-    
+
     //Metodo para guardar los datos del nuevo vehiculo
     private void guardarNuevoVehiculo() {
         try {
-        	if (Double.parseDouble(tfPrecio.getText()) <= 0) {
-        		JOptionPane.showMessageDialog(this, "El Precio debe ser mayor de 0.",
+            double precio = Double.parseDouble(tfPrecio.getText().trim());
+            if (precio <= 0) {
+                JOptionPane.showMessageDialog(this, "El Precio debe ser mayor de 0.",
                         "Datos incorrectos", JOptionPane.WARNING_MESSAGE);
-        	}
-            Vehiculo nuevo = new Vehiculo(tfMarca.getText(), 
-            		tfModelo.getText(),
-                    Integer.parseInt(tfAnio.getText()), 
-                    Double.parseDouble(tfPrecio.getText()),
-                    tfEstado.getText(), 
-                    tfTipo.getText(), 
-                    tfMatricula.getText(),
-                    Integer.parseInt(tfKm.getText()));
+                return;
+            }
+            Vehiculo nuevo = new Vehiculo(
+                    Marca.valueOf(tfMarca.getText().trim().toUpperCase()),
+                    tfModelo.getText().trim(),
+                    Integer.parseInt(tfAnio.getText().trim()),
+                    precio,
+                    Estado.valueOf(tfEstado.getText().trim().toUpperCase().replace(" ", "_")),
+                    Tipo.valueOf(tfTipo.getText().trim().toUpperCase()),
+                    tfMatricula.getText().trim(),
+                    Integer.parseInt(tfKm.getText().trim()));
             coches.add(nuevo);
             actualizarTabla();
             mostrarDetalles(nuevo, false);
-        } catch (NumberFormatException excepcion) {
-            JOptionPane.showMessageDialog(this, "El año y el precio deben ser numéricos.",
+        } catch (IllegalArgumentException excepcion) {
+            JOptionPane.showMessageDialog(this,
+                    "Revisa los datos: los campos numéricos y los valores de Marca, Estado o Tipo deben ser válidos.",
                     "Datos incorrectos", JOptionPane.WARNING_MESSAGE);
         }
     }

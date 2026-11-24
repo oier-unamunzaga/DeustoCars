@@ -21,6 +21,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import domain.Vehiculo;
+import domain.Vehiculo.Estado;
+import domain.Vehiculo.Marca;
+import domain.Vehiculo.Tipo;
 
 
 public class VentanaCatalogo extends JFrame {
@@ -214,11 +217,11 @@ public class VentanaCatalogo extends JFrame {
 
 	private ArrayList<Vehiculo> cargarVehiculosPrueba() {
 		ArrayList<Vehiculo> vehiculos = new ArrayList<Vehiculo>();
-		vehiculos.add(new Vehiculo("Tesla", "Model 3", 2024, 41000, "En venta", "Electrico", "1234ABC", 30000));
-		vehiculos.add(new Vehiculo("Toyota", "Corolla Hybrid", 2022, 24500, "En venta", "Hibrido", "5678DEF", 42000));
-		vehiculos.add(new Vehiculo("Volkswagen", "Golf", 2021, 19900, "En venta", "Gasolina", "9012GHI", 58000));
-		vehiculos.add(new Vehiculo("BMW", "320i", 2020, 27800, "En venta", "Gasolina", "3456JKL", 76000));
-		vehiculos.add(new Vehiculo("Hyundai", "Kona EV", 2023, 29950, "En venta", "Electrico", "7890MNO", 21000));
+		vehiculos.add(new Vehiculo(Marca.TESLA, "Model 3", 2024, 41000, Estado.EN_VENTA, Tipo.ELECTRICO, "1234ABC", 30000));
+		vehiculos.add(new Vehiculo(Marca.TOYOTA, "Corolla Hybrid", 2022, 24500, Estado.EN_VENTA, Tipo.HIBRIDO, "1254ABC", 3000));
+		vehiculos.add(new Vehiculo(Marca.VOLKSWAGEN,"Golf", 2021, 19900, Estado.EN_VENTA, Tipo.GASOLINA, "9012GHI", 20000));
+		vehiculos.add(new Vehiculo(Marca.BMW, "320i", 2020, 27800, Estado.EN_VENTA, Tipo.GASOLINA, "3456JKL", 12000));
+		vehiculos.add(new Vehiculo(Marca.HYUNDAI, "Kona EV", 2023, 29950, Estado.EN_VENTA, Tipo.HIBRIDO, "7890MNO", 21000));
 		return vehiculos;
 	}
 
