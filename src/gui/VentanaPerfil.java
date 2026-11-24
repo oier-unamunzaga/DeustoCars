@@ -5,8 +5,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +46,7 @@ public class VentanaPerfil extends JFrame{
 	private List<Vehiculo> lFavoritos;
 	private List<Solicitud> lMisSolicitudes, lSolicitudesRecibidas;
 	private String seccion;
+	private int filaSeleccionada; //Fila de la tabla en la que ha hecho click el usuario (-1 si no hay ninguna)
 	
 	public VentanaPerfil(String usuario, List<Vehiculo> lf, List<Solicitud> lms, List<Solicitud> lsr) {
 		super();
@@ -125,6 +129,7 @@ public class VentanaPerfil extends JFrame{
 		tabla.setRowHeight(30);
 		tabla.getTableHeader().setReorderingAllowed(false);
 		seccion = "FAVORITOS";
+		filaSeleccionada = -1; //Al principio no hay ninguna fila seleccionada
 
 		btnAccion1 = new JButton("Ver detalle");
 		btnAccion2 = new JButton("Quitar de favoritos");
@@ -157,9 +162,10 @@ public class VentanaPerfil extends JFrame{
 				} else {
 					l.setBackground(Color.WHITE);
 				}
-				if ("En venta".equals(value) || "Aceptada".equals(value)) {
+				//El estado del vehículo es un enum (Vehiculo.Estado) y el de la solicitud un String
+				if (Vehiculo.Estado.EN_VENTA.equals(value) || "Aceptada".equals(value)) {
 					l.setForeground(new Color(0, 130, 0));
-				} else if ("Vendido".equals(value) || "Rechazada".equals(value)) {
+				} else if (Vehiculo.Estado.VENDIDO.equals(value) || "Rechazada".equals(value)) {
 					l.setForeground(Color.RED);
 				} else if ("Pendiente".equals(value)) {
 					l.setForeground(Color.ORANGE);
@@ -169,12 +175,40 @@ public class VentanaPerfil extends JFrame{
 		});
 		
 		//Listeners
+
+		//Al hacer click en la tabla guardamos la fila pulsada
+		tabla.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Point p = e.getPoint(); //Coordenadas (x, y) en las que se ha hecho click
+				filaSeleccionada = tabla.rowAtPoint(p); //Fila que hay en ese punto (-1 si no hay ninguna)
+			}
+		});
+
 		btnMisAnuncios.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Aquí se abrirá la Ventana 3 de Oier
-				JOptionPane.showMessageDialog(null, "Aquí se abrirá la Ventana 3 (Publicar y gestionar anuncios)");
+				//Abrimos la Ventana 3 de Oier (Publicar y gestionar anuncios)
+				VentanaPublicacionYGestionAnuncios ventana = new VentanaPublicacionYGestionAnuncios();
+				ventana.setVisible(true);
 			}
 		});
 
@@ -189,6 +223,7 @@ public class VentanaPerfil extends JFrame{
 				btnAccion2.setText("Quitar de favoritos");
 				btnAccion2.setVisible(true);
 				seccion = "FAVORITOS";
+				filaSeleccionada = -1;
 			}
 		});
 
@@ -202,6 +237,7 @@ public class VentanaPerfil extends JFrame{
 				btnAccion1.setText("Ver detalle");
 				btnAccion2.setVisible(false); //En esta sección solo hay un botón
 				seccion = "MIS_SOLICITUDES";
+				filaSeleccionada = -1;
 			}
 		});
 
@@ -216,23 +252,89 @@ public class VentanaPerfil extends JFrame{
 				btnAccion2.setText("Rechazar");
 				btnAccion2.setVisible(true);
 				seccion = "RECIBIDAS";
+				filaSeleccionada = -1;
 			}
 		});
 
+		//Perfil: vuelve a la sección inicial (Mis favoritos)
+		btnPerfil.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnFavoritos.doClick(); //Hace lo mismo que si se pulsara el botón Mis favoritos
+			}
+		});
+
+		//Botón de acción 1: Ver detalle (favoritos y mis solicitudes) o Aceptar (recibidas)
 		btnAccion1.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//De momento solo avisa; falta saber qué fila está seleccionada
-				JOptionPane.showMessageDialog(null, btnAccion1.getText() + " (sección " + seccion + ") - pendiente");
+				if (filaSeleccionada == -1) {
+					JOptionPane.showMessageDialog(null, "Selecciona primero una fila de la tabla");
+				} else if (seccion.equals("FAVORITOS")) {
+					Vehiculo v = lFavoritos.get(filaSeleccionada);
+					JOptionPane.showMessageDialog(null, "Marca: " + v.getMarca() + "\nModelo: " + v.getModelo()
+							+ "\nAño: " + v.getAnio() + "\nPrecio: " + v.getPrecio() + " €" + "\nKm: " + v.getKm()
+							+ "\nTipo: " + v.getTipo() + "\nMatrícula: " + v.getMatricula() + "\nEstado: " + v.getEstado());
+				} else if (seccion.equals("MIS_SOLICITUDES")) {
+					Solicitud s = lMisSolicitudes.get(filaSeleccionada);
+					Vehiculo v = s.getVehiculo();
+					JOptionPane.showMessageDialog(null, "Marca: " + v.getMarca() + "\nModelo: " + v.getModelo()
+							+ "\nAño: " + v.getAnio() + "\nPrecio: " + v.getPrecio() + " €" + "\nKm: " + v.getKm()
+							+ "\nTipo: " + v.getTipo() + "\nMatrícula: " + v.getMatricula()
+							+ "\n\nFecha de la solicitud: " + s.getFecha() + "\nEstado de la solicitud: " + s.getEstado());
+				} else if (seccion.equals("RECIBIDAS")) {
+					//Aceptar la solicitud
+					Solicitud s = lSolicitudesRecibidas.get(filaSeleccionada);
+					if (!s.getEstado().equals("Pendiente")) {
+						JOptionPane.showMessageDialog(null, "Esta solicitud ya está " + s.getEstado());
+					} else {
+						s.setEstado("Aceptada");
+						s.getVehiculo().setEstado(Vehiculo.Estado.VENDIDO); //RF-19: el anuncio pasa a vendido
+						//El resto de solicitudes pendientes de ese mismo coche se rechazan
+						for (Solicitud otra : lSolicitudesRecibidas) {
+							if (otra != s && otra.getEstado().equals("Pendiente")
+									&& otra.getVehiculo().getMatricula().equals(s.getVehiculo().getMatricula())) {
+								otra.setEstado("Rechazada");
+							}
+						}
+						modeloTabla = new ModeloSolicitudes(lSolicitudesRecibidas);
+						tabla.setModel(modeloTabla);
+						filaSeleccionada = -1;
+						JOptionPane.showMessageDialog(null, "Solicitud aceptada. El vehículo ha pasado a Vendido");
+					}
+				}
 			}
 		});
 
+		//Botón de acción 2: Quitar de favoritos (favoritos) o Rechazar (recibidas)
 		btnAccion2.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, btnAccion2.getText() + " (sección " + seccion + ") - pendiente");
+				if (filaSeleccionada == -1) {
+					JOptionPane.showMessageDialog(null, "Selecciona primero una fila de la tabla");
+				} else if (seccion.equals("FAVORITOS")) {
+					Vehiculo v = lFavoritos.get(filaSeleccionada);
+					lFavoritos.remove(filaSeleccionada); //RF-16: quitar de favoritos
+					modeloTabla = new ModeloFavoritos(lFavoritos);
+					tabla.setModel(modeloTabla);
+					filaSeleccionada = -1;
+					JOptionPane.showMessageDialog(null, v.getMarca() + " " + v.getModelo() + " quitado de favoritos");
+				} else if (seccion.equals("RECIBIDAS")) {
+					//Rechazar la solicitud
+					Solicitud s = lSolicitudesRecibidas.get(filaSeleccionada);
+					if (!s.getEstado().equals("Pendiente")) {
+						JOptionPane.showMessageDialog(null, "Esta solicitud ya está " + s.getEstado());
+					} else {
+						s.setEstado("Rechazada");
+						modeloTabla = new ModeloSolicitudes(lSolicitudesRecibidas);
+						tabla.setModel(modeloTabla);
+						filaSeleccionada = -1;
+						JOptionPane.showMessageDialog(null, "Solicitud rechazada");
+					}
+				}
 			}
 		});
 
@@ -240,7 +342,8 @@ public class VentanaPerfil extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Editar datos - pendiente");
+				//Abre la ventana para editar los datos; le pasamos la etiqueta del usuario para que la actualice
+				new VentanaEditarDatos(lblUsuario);
 			}
 		});
 
@@ -248,8 +351,11 @@ public class VentanaPerfil extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Aquí se volverá a la Ventana 5 (Iniciar sesión)
-				JOptionPane.showMessageDialog(null, "Cerrar sesión - pendiente");
+				//Volvemos a la Ventana 5 (Iniciar sesión) y cerramos esta, igual que hace Oier en sus ventanas
+				JOptionPane.showMessageDialog(null, "Has cerrado sesión");
+				VentanaIniciarSesion ventana = new VentanaIniciarSesion();
+				ventana.setVisible(true);
+				dispose(); //Cerramos esta ventana
 			}
 		});
 		
@@ -259,9 +365,9 @@ public class VentanaPerfil extends JFrame{
 	
 	public static void main(String[] args) {
 		//Datos de prueba
-		Vehiculo v1 = new Vehiculo("Toyota", "Corolla", 2019, 18500, "En venta", "Hibrido", "1234ABC", 60000);
-		Vehiculo v2 = new Vehiculo("Seat", "Ibiza", 2015, 9900, "Vendido", "Gasolina", "5678DEF", 120000);
-		Vehiculo v3 = new Vehiculo("Tesla", "Model 3", 2021, 32000, "En venta", "Electrico", "9012GHI", 40000);
+		Vehiculo v1 = new Vehiculo(Vehiculo.Marca.TOYOTA, "Corolla", 2019, 18500, Vehiculo.Estado.EN_VENTA, Vehiculo.Tipo.HIBRIDO, "1234ABC", 60000);
+		Vehiculo v2 = new Vehiculo(Vehiculo.Marca.SEAT, "Ibiza", 2015, 9900, Vehiculo.Estado.VENDIDO, Vehiculo.Tipo.GASOLINA, "5678DEF", 120000);
+		Vehiculo v3 = new Vehiculo(Vehiculo.Marca.TESLA, "Model 3", 2021, 32000, Vehiculo.Estado.EN_VENTA, Vehiculo.Tipo.ELECTRICO, "9012GHI", 40000);
 
 		List<Vehiculo> lf = new ArrayList<>();
 		lf.add(v1);
@@ -272,7 +378,7 @@ public class VentanaPerfil extends JFrame{
 
 		List<Solicitud> lsr = new ArrayList<>();
 		lsr.add(new Solicitud(v1, "ana_g", "17/11/2026", "Pendiente"));
-		lsr.add(new Solicitud(v1, "mikel", "15/11/2026", "Rechazada"));
+		lsr.add(new Solicitud(v1, "mikel", "15/11/2026", "Pendiente"));
 
 		new VentanaPerfil("pablo", lf, lms, lsr);
 	}
