@@ -2,6 +2,7 @@ package gui;
 
 import domain.Usuario;
 import domain.Vehiculo;
+import domain.Vehiculo.Marca;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -96,7 +97,12 @@ public class VentanaCaracteristicas extends JFrame {
         return panelInformacion;
     }
 
-    private JPanel crearCampoSoloLectura(String titulo, String valor) {
+    private Component crearCampoSoloLectura(String titulo, Marca marca) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private JPanel crearCampoSoloLectura(String titulo, String valor) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder(titulo));
         JTextField txt = new JTextField(valor);
