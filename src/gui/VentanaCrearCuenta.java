@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 //Luego JDialog
@@ -96,8 +97,29 @@ public class VentanaCrearCuenta extends JFrame {
         JPanel pContraseña = new JPanel(new GridLayout(2, 1, 0, 5));
         JLabel lbContraseña = new JLabel("Contraseña (mínimo 8 dígitos):", JLabel.LEFT);
         pContraseña.add(lbContraseña);
-        JTextField tfContraseña = new JTextField();
-        pContraseña.add(tfContraseña);
+        JPanel pCampoContraseña = new JPanel(new BorderLayout(5, 0));
+        JPasswordField tfContraseña = new JPasswordField();
+        //Le asigno ese simbolo al PasswordField para que la contraseña no sea visible
+        tfContraseña.setEchoChar('•');
+        JButton bMostrarContraseña = new JButton("Mostrar");
+        pCampoContraseña.add(tfContraseña, BorderLayout.CENTER);
+        pCampoContraseña.add(bMostrarContraseña, BorderLayout.EAST);
+        pContraseña.add(pCampoContraseña);
+
+        //Botón para mostrar u ocultar la contraseña
+        bMostrarContraseña.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (tfContraseña.getEchoChar() == 0) {
+					tfContraseña.setEchoChar('•');
+					bMostrarContraseña.setText("Mostrar");
+				} else {
+					//Esto sirve para mostrar el caracter que hay tal cual
+					tfContraseña.setEchoChar((char) 0);
+					bMostrarContraseña.setText("Ocultar");
+				}
+			}
+		});
 
         //Panel botones
         JPanel pBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
@@ -137,6 +159,15 @@ public class VentanaCrearCuenta extends JFrame {
 				VentanaIniciarSesion ventana = new VentanaIniciarSesion();
 				ventana.setVisible(true);
 				//Cerramos esta ventana
+				dispose();
+			}
+		});
+        
+        //ActionListener Cancelar
+        bCancelar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});

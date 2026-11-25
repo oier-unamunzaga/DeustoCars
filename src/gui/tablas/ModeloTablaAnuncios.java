@@ -43,8 +43,8 @@ public class ModeloTablaAnuncios extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int fila, int columna) {
-    	//La columna de acciones es editable porque los botones activan el TableCellEditor aunque no se cambie nada de la celda
-        return columna == 4;
+	    //La columna de acciones no se edita porque los botones se gestionan directamente desde la tabla.
+	    return false;
     }
 
     public void limpiar() {
