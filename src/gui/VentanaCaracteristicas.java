@@ -2,6 +2,8 @@ package gui;
 
 import domain.Usuario;
 import domain.Vehiculo;
+import domain.Vehiculo.Estado;
+import domain.Vehiculo.Tipo;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -96,10 +98,10 @@ public class VentanaCaracteristicas extends JFrame {
         panelIzquierdo.add(Box.createVerticalStrut(10));
 
         JPanel panelEstado = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        String estadoActual = (vehiculo.getEstado() != null) ? vehiculo.getEstado() : "En venta";
-        JLabel lblEstado = new JLabel("Estado del vehículo: " + estadoActual);
+        Estado estadoActual = (vehiculo.getEstado() != null) ? vehiculo.getEstado() : Estado.EN_VENTA;
+        boolean enVenta = (estadoActual == Estado.EN_VENTA);
+        JLabel lblEstado = new JLabel("Estado del vehículo: " + (enVenta ? "En venta" : "Vendido"));
         lblEstado.setFont(new Font("SansSerif", Font.BOLD, 14));
-        boolean enVenta = "En venta".equalsIgnoreCase(estadoActual);
         lblEstado.setForeground(enVenta ? new Color(0, 128, 0) : Color.RED);
         panelEstado.add(lblEstado);
         panelIzquierdo.add(panelEstado);
@@ -188,7 +190,8 @@ public class VentanaCaracteristicas extends JFrame {
         JPanel panelInformacion = new JPanel(new GridLayout(5, 1, 5, 8));
 
         JPanel panelMarcaModelo = new JPanel(new GridLayout(1, 2, 10, 0));
-        panelMarcaModelo.add(crearCampoSoloLectura("Marca", vehiculo.getMarca()));
+        String nombreMarca = (vehiculo.getMarca() != null) ? vehiculo.getMarca().getNombre() : "";
+        panelMarcaModelo.add(crearCampoSoloLectura("Marca", nombreMarca));
         panelMarcaModelo.add(crearCampoSoloLectura("Modelo", vehiculo.getModelo()));
         panelInformacion.add(panelMarcaModelo);
 
@@ -201,9 +204,15 @@ public class VentanaCaracteristicas extends JFrame {
         panelInformacion.add(panelPrecio);
 
         JPanel panelDatosTecnicos = new JPanel(new GridLayout(2, 2, 8, 5));
-        int km = (int) detallesExtra.getOrDefault("kilometraje", 0);
-        String combustible = (String) detallesExtra.getOrDefault("combustible", "No especificado");
-        String ubicacion = (String) detallesExtra.getOrDefault("ubicacion", "Bilbao, Bizkaia");
+        int km = vehiculo.getKm();
+        if (km <= 0 && detallesExtra.get("kilometraje") instanceof Number) {
+            km = ((Number) detallesExtra.get("kilometraje")).intValue();
+        }
+        String combustible = textoTipo(vehiculo.getTipo());
+        if (combustible == null) {
+            combustible = textoExtra("combustible", "No especificado");
+        }
+        String ubicacion = textoExtra("ubicacion", "Bilbao, Bizkaia");
 
         panelDatosTecnicos.add(new JLabel(String.format("Kilómetros: %,d km", km)));
         panelDatosTecnicos.add(new JLabel("Combustible: " + combustible));
@@ -214,7 +223,7 @@ public class VentanaCaracteristicas extends JFrame {
         JPanel panelDescripcion = new JPanel(new BorderLayout(5, 5));
         panelDescripcion.add(new JLabel("Descripción y equipamiento adicional:"), BorderLayout.NORTH);
         JTextArea txtDescripcion = new JTextArea(
-                (String) detallesExtra.getOrDefault("descripcion", "Sin descripción adicional.")
+                textoExtra("descripcion", "Sin descripción adicional.")
         );
         txtDescripcion.setEditable(false);
         txtDescripcion.setLineWrap(true);
@@ -227,6 +236,25 @@ public class VentanaCaracteristicas extends JFrame {
         panelInformacion.add(panelGarantia);
 
         return panelInformacion;
+    }
+
+    /** Devuelve un texto de detallesExtra, o el valor por defecto si no existe o no es un String. */
+    private String textoExtra(String clave, String porDefecto) {
+        Object valor = detallesExtra.get(clave);
+        return (valor instanceof String) ? (String) valor : porDefecto;
+    }
+
+    /** Convierte el enum Tipo a texto legible (null si el vehículo no tiene tipo). */
+    private String textoTipo(Tipo tipo) {
+        if (tipo == null) {
+            return null;
+        }
+        switch (tipo) {
+            case ELECTRICO: return "Eléctrico";
+            case HIBRIDO:   return "Híbrido";
+            case GASOLINA:  return "Gasolina";
+            default:        return tipo.toString();
+        }
     }
 
     private JPanel crearCampoSoloLectura(String titulo, String valor) {

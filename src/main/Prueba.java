@@ -2,6 +2,9 @@ package main;
 
 import domain.Usuario;
 import domain.Vehiculo;
+import domain.Vehiculo.Estado;
+import domain.Vehiculo.Marca;
+import domain.Vehiculo.Tipo;
 import gui.VentanaCaracteristicas;
 
 import javax.swing.SwingUtilities;
@@ -14,7 +17,7 @@ public class Prueba {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Usuario u = new Usuario(1, "Adrián Cámara", "adrian", "adrian@deusto.es");
-            Vehiculo v = new Vehiculo("Toyota", "Corolla Hybrid", 2022, 24500.0, "En venta");
+            Vehiculo v = new Vehiculo(Marca.TOYOTA, "Corolla" , 2022, 24500.0,Estado.EN_VENTA,Tipo.HIBRIDO,"0863CFD",300000);
 
             Map<String, Object> extras = new HashMap<>();
             extras.put("kilometraje", 42000);
@@ -32,8 +35,8 @@ public class Prueba {
             VentanaCaracteristicas ventana = new VentanaCaracteristicas(v, extras, u, null);
 
             List<Vehiculo> similaresPrueba = Arrays.asList(
-                    new Vehiculo("Hyundai", "Kona EV", 2023, 29950.0, "En venta"),
-                    new Vehiculo("Volkswagen", "Golf", 2021, 19900.0, "En venta")
+                    new Vehiculo(Marca.HYUNDAI, "Kona EV", 2023, 29950.0,Estado.EN_VENTA,Tipo.ELECTRICO, "1296FJK",200000),
+                    new Vehiculo(Marca.VOLKSWAGEN, "Golf", 2021, 19900.0,Estado.EN_VENTA, Tipo.GASOLINA,"9642LIE",156000)
             );
             ventana.pintarTarjetasSimilares(similaresPrueba);
 
