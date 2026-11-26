@@ -16,7 +16,7 @@ import java.util.Map;
 public class Prueba {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Usuario u = new Usuario(1, "Adrián Cámara", "adrian", "adrian@deusto.es");
+            Usuario u = new Usuario(1, "Adrián Cámara", "adrian", "adrian@deusto.es","1234");
             Vehiculo v = new Vehiculo(Marca.TOYOTA, "Corolla" , 2022, 24500.0,Estado.EN_VENTA,Tipo.HIBRIDO,"0863CFD",300000);
 
             Map<String, Object> extras = new HashMap<>();
