@@ -118,17 +118,21 @@ public class VentanaCaracteristicas extends JFrame {
         btnFavoritos.addActionListener(e -> {
             if (usuarioSesion == null) {
                 JOptionPane.showMessageDialog(this, "Debes iniciar sesión para añadir favoritos.", "Sesión requerida", JOptionPane.WARNING_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Vehículo marcado para favoritos (se guardará en SQLite en el Día 6).");
+                return;
             }
+            JOptionPane.showMessageDialog(this, "Vehículo añadido a favoritos.", "Favoritos", JOptionPane.INFORMATION_MESSAGE);
         });
 
         btnSolicitarCompra.addActionListener(e -> {
             if (usuarioSesion == null) {
                 JOptionPane.showMessageDialog(this, "Debes iniciar sesión para solicitar la compra.", "Sesión requerida", JOptionPane.WARNING_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Aquí se abrirá DialogoSolicitudCompra (Día 5).");
+                return;
             }
+            if (vehiculo.getEstado() == Vehiculo.Estado.VENDIDO) {
+                JOptionPane.showMessageDialog(this, "Este vehículo ya está vendido y no admite solicitudes.", "No disponible", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            new SolicitudCompra(this, vehiculo, usuarioSesion).setVisible(true);
         });
 
         panelAcciones.add(btnFavoritos);
@@ -238,13 +242,11 @@ public class VentanaCaracteristicas extends JFrame {
         return panelInformacion;
     }
 
-    /** Devuelve un texto de detallesExtra, o el valor por defecto si no existe o no es un String. */
     private String textoExtra(String clave, String porDefecto) {
         Object valor = detallesExtra.get(clave);
         return (valor instanceof String) ? (String) valor : porDefecto;
     }
 
-    /** Convierte el enum Tipo a texto legible (null si el vehículo no tiene tipo). */
     private String textoTipo(Tipo tipo) {
         if (tipo == null) {
             return null;
