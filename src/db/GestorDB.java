@@ -235,14 +235,14 @@ public class GestorDB {
 		}
 	}
 		//Al iniciar sesion
-	public boolean comprobarCredenciales(String correo, String contraseña) {
+	public boolean comprobarCredenciales(String usuario, String contraseña) {
 	    String sql = "SELECT ID FROM USUARIO "
-	               + "WHERE EMAIL = ? AND CONTRASEÑA = ?";
+	               + "WHERE USERNAME = ? AND CONTRASEÑA = ?";
 
 	    try (Connection con = DriverManager.getConnection(CONNECTION_STRING);
 	         PreparedStatement pstmt = con.prepareStatement(sql)) {
 
-	        pstmt.setString(1, correo);
+	        pstmt.setString(1, usuario);
 	        pstmt.setString(2, contraseña);
 
 	        try (ResultSet rs = pstmt.executeQuery()) {
