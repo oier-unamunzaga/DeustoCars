@@ -1,17 +1,22 @@
 package domain;
 
 public class Solicitud {
-
+	
+	private int id;
 	private Vehiculo vehiculo;
-	private String comprador; //Usuario que quiere comprar el vehículo
+	private Usuario comprador; //Usuario que quiere comprar el vehículo
 	private String fecha;     //Ejemplo: "18/11/2026"
-	private String estado;    //Pendiente, Aceptada o Rechazada
+	private EstadoSolicitud estado;    //Pendiente, Aceptada o Rechazada
+	
+	public enum EstadoSolicitud {
+		PENDIENTE, ACEPTADA, RECHADADA
+	}
 
 	public Solicitud() {
 		super();
 	}
 
-	public Solicitud(Vehiculo vehiculo, String comprador, String fecha, String estado) {
+	public Solicitud(Vehiculo vehiculo, Usuario comprador, String fecha, EstadoSolicitud estado) {
 		super();
 		this.vehiculo = vehiculo;
 		this.comprador = comprador;
@@ -27,11 +32,11 @@ public class Solicitud {
 		this.vehiculo = vehiculo;
 	}
 
-	public String getComprador() {
+	public Usuario getComprador() {
 		return comprador;
 	}
 
-	public void setComprador(String comprador) {
+	public void setComprador(Usuario comprador) {
 		this.comprador = comprador;
 	}
 
@@ -43,12 +48,20 @@ public class Solicitud {
 		this.fecha = fecha;
 	}
 
-	public String getEstado() {
+	public EstadoSolicitud getEstado() {
 		return estado;
 	}
 
-	public void setEstado(String estado) {
+	public void setEstado(EstadoSolicitud estado) {
 		this.estado = estado;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	@Override

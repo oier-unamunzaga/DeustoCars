@@ -1,7 +1,8 @@
 package domain;
 
 public class Vehiculo {
-
+	
+	private int id;
     private Marca marca;
     private String modelo;
     private int anio;
@@ -10,7 +11,9 @@ public class Vehiculo {
     private Tipo tipo; //Electrico, Hibrido o Gasolina
     private String matricula;
     private int km;
-    //Marcas de coche que se pueden usar
+    private Usuario usuario; //Dueño del coche
+    
+    //Marcas de coche que se pueden vender
     public enum Marca {
     	TOYOTA("Toyota", "resources/images/marcas/toyota.png"),
     	BMW("BMW", "resources/images/marcas/bmw.png"),
@@ -65,10 +68,10 @@ public class Vehiculo {
     
     //Tipo de combustible
     public enum Tipo {
-    	ELECTRICO, GASOLINA, HIBRIDO
+    	ELECTRICO, GASOLINA, HIBRIDO, DIESEL
     }
     
-    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado, Tipo tipo, String matricula, int km) {
+    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado, Tipo tipo, String matricula, int km, Usuario usuario) {
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
@@ -77,11 +80,12 @@ public class Vehiculo {
         this.tipo = tipo;
         this.matricula = matricula;
         this.km = km;
+        this.usuario = usuario;
     }
 
     // Constructor compatible con el código anterior de Prueba.java.
-    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado) {
-        this(marca, modelo, anio, precio, estado, null, null, 0);
+    public Vehiculo(Marca marca, String modelo, int anio, double precio, Estado estado, Usuario usuario) {
+        this(marca, modelo, anio, precio, estado, null, null, 0, usuario);
     }
 
     public Marca getMarca() {
@@ -147,6 +151,23 @@ public class Vehiculo {
 	public void setKm(int km) {
 		this.km = km;
 	}
-    
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	
     
 }
